@@ -1,0 +1,204 @@
+{{extend 'layout.html'}}
+
+<div class="container">
+  <div class="row">
+    <div class="col-12">
+      <div
+        class="banner text-light py-3 px-4 mb-2"
+        style="background-color: rgb(68, 0, 0)"
+      >
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <h5 class="m-0">WJV Surplus Shop</h5>
+            <p class="m-0" style="color: rgb(255, 255, 255)">
+              Open the integrated sales tracker to start tracking your sales.
+            </p>
+          </div>
+          <a href="{{=URL('default','branch_pos')}}"
+            ><button class="btn btn-light">Open</button>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row feat-container">
+    <div class="col-lg-3">
+      <a class="card-feat card" href="{{=URL('default','bundles')}}">
+        <div class="card-body">
+          <h5 class="card-title-subpage"><i class="fas fa-box"></i> Bundles</h5>
+          <p class="card-text">
+            This section provides information about various bundles available in
+            Ukay-Ukay stores.
+          </p>
+        </div>
+      </a>
+    </div>
+    <div class="col-lg-3">
+      <a class="card-feat card" href="{{=URL('default','branch_index')}}">
+        <div class="card-body">
+          <h5 class="card-title-subpage">
+            <i class="fas fa-code-branch"></i> Branches
+          </h5>
+          <p class="card-text">
+            Explore the different branches of Ukay-Ukay stores across the Cebu.
+          </p>
+        </div>
+      </a>
+    </div>
+
+    <!-- <div class="col-lg-3">
+      <a class="card-feat card" href="{{=URL('default','pricecode_index')}}">
+        <div class="card-body">
+          <h5 class="card-title-subpage">
+            <i class="fas fa-solid fa-tags"></i> Price Codes
+          </h5>
+          <p class="card-text">View and Manage Ukay-Ukay Fix Price Codes</p>
+        </div>
+      </a>
+    </div> -->
+
+    <div class="col-lg-3">
+      <a class="card-feat card" href="{{=URL('dashboard','index')}}">
+        <div class="card-body">
+          <h5 class="card-title-subpage">
+            <i class="fa-solid fa-money-bill-wave"></i> Sales
+          </h5>
+          <p class="card-text">
+            This section provides an overview and tracking of sales performance
+            in Ukay-Ukay stores.
+          </p>
+        </div>
+      </a>
+    </div>
+
+    <div class="col-lg-3">
+      <a class="card-feat card" href="{{=URL('overview','index')}}">
+        <div class="card-body">
+          <h5 class="card-title-subpage">
+            <i class="fa-solid fa-square-poll-horizontal"></i> Overview
+          </h5>
+          <p class="card-text">
+            This section provides an overview and tracking of sales performance
+            in Ukay-Ukay stores in card form.
+          </p>
+        </div>
+      </a>
+    </div>
+
+    <div class="col-lg-3">
+      <a class="card-feat card" href="{{=URL('manager', 'manager_request')}}">
+        <div class="card-body">
+          <h5 class="card-title-subpage">
+            <i class="fa-solid fa-hand-point-up"></i>
+            Manager Request
+          </h5>
+          <p class="card-text">Here the manager can request bargain prices.</p>
+        </div>
+      </a>
+    </div>
+
+    <div class="col-lg-3">
+      <a class="card-feat card" href="{{=URL('manager','review_item')}}">
+        <div class="card-body">
+          <h5 class="card-title-subpage">
+            <i class="fa-solid fa-pen-to-square"></i>
+            Bargain Management
+          </h5>
+          <p class="card-text">
+            Open the Bargain Management to manage the manager's requests for
+            price bargains.
+          </p>
+        </div>
+      </a>
+    </div>
+
+    <div class="col-lg-3">
+      <a
+        class="card-feat card"
+        href="{{=URL('manager', 'bundle_bargain_request')}}"
+      >
+        <div class="card-body">
+          <h5 class="card-title-subpage">
+            <i class="fa-solid fa-file-lines"></i> Bargain Request Records
+          </h5>
+          <p class="card-text">
+            Open the Bargain Request Records to review the manager's requests
+            for price bargains.
+          </p>
+        </div>
+      </a>
+    </div>
+  </div>
+</div>
+
+<br /><br />
+
+<style>
+  .card-title {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background-color: #006874;
+    padding: 5px 10px;
+    border-radius: 10px 0 10px 10px;
+  }
+  .card-title-subpage,
+  p {
+    color: rgb(117, 0, 0);
+  }
+  .date {
+    text-decoration: underline;
+  }
+  .cards-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    justify-content: center;
+  }
+  .feat-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .card-feat {
+    text-decoration: none;
+    overflow: hidden;
+    height: 200px;
+  }
+
+  .card {
+    text-decoration: none;
+    overflow: hidden;
+    margin: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+  }
+  .card:hover {
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Adds a stronger shadow on hover */
+  }
+  .card-bundles {
+    text-decoration: none;
+    overflow: hidden;
+    max-width: 400px;
+  }
+
+  .card:hover {
+    text-decoration: none;
+    transform: scale(0.95);
+  }
+  @media only screen and (max-width: 600px) {
+    .page-title {
+      text-align: center;
+    }
+    .modal-bundle-items {
+      font-size: 12px;
+    }
+    .card {
+      margin: 10px auto;
+    }
+    .card-feat {
+      height: fit-content;
+    }
+  }
+</style>

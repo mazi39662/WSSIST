@@ -1,0 +1,215 @@
+{{extend 'layout.html'}}
+<br />
+<div class="content-container">
+  <form action="{{=URL('overview', 'index')}}" method="get" class="date-picker-container">
+    <div class="form-group">
+      <label for="date-from-picker">Date From:</label>
+      <input type="text" id="date-from-picker" name="date_from" class="form-control" value="{{=date_from}}" placeholder="YYYY-MM-DD" />
+    </div>
+  
+    <div class="form-group">
+      <label for="date-to-picker">Date To:</label>
+      <input type="text" id="date-to-picker" name="date_to" class="form-control" value="{{=date_to}}" placeholder="YYYY-MM-DD" />
+    </div>
+  
+    <div class="form-group">
+      <label for="branch-picker">Branch:</label>
+      <select id="branch-picker" name="branch_id" class="form-control">
+        <option value="">Select Branch</option>
+        {{ for branch in branches: }}
+          <option value="{{=branch.id}}" {{='selected' if branch.id == selected_branch_id else ''}}>{{=branch.name}}</option>
+        {{ pass }}
+      </select>
+    </div>
+  
+    <button type="submit" class="btn btn-primary submit-btn">Submit</button>
+  </form>  
+  
+  <div class="cards-container">
+    {{ for bundle in bundle_table: }}
+    <div
+      class="card"
+      data-bundle-id="{{= bundle.id }}"
+      onclick="showModal('{{= bundle.id }}')"
+    >
+      <div class="card-body">
+        <h5 class="card-title">{{= bundle.bundle_code }}</h5>
+        <h6 class="card-subtitle mb-2 text-muted">{{= bundle.item_number }}</h6>
+
+        <p class="card-text"><strong>{{= bundle.description }}</strong></p>
+        <p class="card-text">{{=bundle.creation_time}}</p>
+        <p class="card-text">
+          <strong
+            >Branch: {{= bundle.branch.name if bundle.branch else 'Unknown'
+            }}</strong
+          >
+        </p>
+
+        <p class="card-text">Price: ₱{{= bundle.price }}</p>
+        <p class="card-text">Total Quantity: {{= bundle.quantity_sum }}</p>
+        <p class="card-text">Quantity Sold: {{= bundle.sold_sum }}</p>
+        <p class="card-text">Quantity Remaining: {{= bundle.total_balance }}</p>
+        <div class="progress">
+          <div
+            class="progress-bar bg-success"
+            role="progressbar"
+            style="width: {{= '{:.1f}'.format((bundle.sold_sum / bundle.quantity_sum) * 100) if bundle.quantity_sum else '0.0' }}%"
+            aria-valuenow="{{= '{:.1f}'.format((bundle.sold_sum / bundle.quantity_sum) * 100) if bundle.quantity_sum else '0.0' }}"
+            aria-valuemin="0"
+            aria-valuemax="100"
+          >
+            <p style="margin: 0">
+              {{= '{:.1f}'.format((bundle.sold_sum / bundle.quantity_sum * 100)
+              if bundle.quantity_sum else 0) }}%
+            </p>
+          </div>
+        </div>
+<!--         <div class="card-text">
+          <p>Total Amount Sold: ₱{{= bundle.total_prices_sold }}</p>
+        </div> -->
+          
+<!--         <div class="progress">
+          <div
+            class="progress-bar bg-info"
+            role="progressbar"
+            style="width: {{= '{:.1f}'.format(bundle.total_prices_sold / bundle.price * 100) if bundle.price else '0.0' }}%"
+            aria-valuenow="{{= '{:.1f}'.format(bundle.total_prices_sold / bundle.price * 100) if bundle.price else '0.0' }}"
+            aria-valuemin="0"
+            aria-valuemax="100"
+          >
+            <p style="margin: 0">
+              {{= '{:.1f}'.format(bundle.total_prices_sold / bundle.price * 100)
+              if bundle.price else 0 }}%
+            </p>
+          </div>
+        </div> -->
+          
+      </div>
+    </div>
+    {{ pass }}
+  </div>
+</div>
+
+<!-- Modal -->
+<div
+  class="modal fade"
+  id="bundleModal"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="bundleModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="bundleModalLabel">Bundle Item Details</h5>
+        <button
+          type="button"
+          class="close"
+          data-dismiss="modal"
+          aria-label="Close"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <!-- Content will be populated dynamically -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<link
+  href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css"
+  rel="stylesheet"
+/>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+
+<script>
+  $(function () {
+    var currentDate = new Date();
+    var formattedDate = currentDate.toISOString().slice(0, 10);
+    $("#date-from-picker, #date-to-picker").datepicker({
+      dateFormat: "yy-mm-dd",
+    });
+  });
+
+  function showModal(bundleId) {
+    $.ajax({
+      url: '{{=URL("get_bundle_items.json")}}',
+      type: "GET",
+      data: {
+        bundle_id: bundleId,
+      },
+      success: function (response) {
+        var modalBody = $(".modal-body");
+        modalBody.empty();
+        $.each(response.bundle_items, function (index, item) {
+          modalBody.append(
+            "<div>" +
+              "<p>Item: " +
+              item.item +
+              "</p>" +
+              "<p>Description: " +
+              item.description +
+              "</p>" +
+              "<p>Price: ₱" +
+              item.price +
+              "</p>" +
+              "<p>Quantity: " +
+              item.quantity +
+              "</p>" +
+              "<p>Quantity Sold: " +
+              item.sold +
+              "</p>" +
+              "<p>Quantity Remaining: " +
+              item.balance +
+              "</p>" +
+              "</br>"
+          );
+        });
+        $("#bundleModal").modal("show");
+      },
+      error: function () {
+        alert("Error fetching bundle items");
+      },
+    });
+  }
+</script>
+
+<style>
+  .date-picker-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+  .submit-btn {
+    height: fit-content;
+    margin-top: 15px;
+  }
+  .form-group {
+    margin-right: 10px;
+  }
+  .content-container {
+    overflow: scroll;
+  }
+  .cards-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .card {
+    width: 300px;
+  }
+  .card-title {
+    background-color: rgb(117, 0, 0);
+    color: whitesmoke;
+    width: fit-content;
+    padding: 5px 10px;
+    border-radius: 10px 0 10px 10px;
+    float: right;
+  }
+</style>

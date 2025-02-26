@@ -1,0 +1,269 @@
+{{extend 'layout.html'}}
+<!-- Loading bar element -->
+<div id="spinner" class="spinner"></div>
+<div id="content">
+  <div class="search-container">
+    <input
+      type="number"
+      name="reference_code"
+      id="reference_code"
+      class="search-input"
+      placeholder="Enter Reference Code"
+    />
+    <button class="btn" onclick="onInputChange()">Searrch</button>
+  </div>
+  <div class="hint">
+    <strong>
+      <p>Hint: Enter Reference Code Above to find the bundle to bargain.</p>
+    </strong>
+  </div>
+
+  <div class="content-container" id="cards-container">
+    <!-- Cards will be dynamically inserted here -->
+  </div>
+</div>
+
+<script>
+  function onInputChange() {
+    var searchedReferenceCode = document.getElementById("reference_code").value;
+    if (searchedReferenceCode) {
+      fetchCards(searchedReferenceCode);
+    }
+  }
+
+  function fetchCards(referenceCode) {
+    var xhr = new XMLHttpRequest();
+    xhr.open(
+      "GET",
+      "{{=URL('manager', 'fetch_cards')}}?reference_code=" + referenceCode,
+      true
+    );
+    xhr.onreadystatechange = function () {
+      if (xhr.readyState === 4 && xhr.status === 200) {
+        var response = JSON.parse(xhr.responseText);
+        displayCards(response.items);
+      }
+    };
+    xhr.send();
+  }
+
+  function displayCards(items) {
+    var container = document.getElementById("cards-container");
+    container.innerHTML = ""; // Clear existing cards
+
+    items.forEach(function (item) {
+      var card = document.createElement("div");
+      card.className = "card";
+      card.setAttribute("data-branch-id", item.bundle_id.branch);
+      card.setAttribute("data-reference-code", item.reference_code);
+
+      // Construct the URL using correct syntax for web2py URL generation
+      var url = "{{=URL('default', 'item_index')}}" + "/" + item.bundle_id.id;
+
+      card.innerHTML = `
+            <h3 class="price"><span class="badge"><s>₱</s trong> ${
+              item.price
+            }</span></h3>
+            <p><strong>Item:</strong> ${item.item}</p>
+            <p><strong>Reference Code:</strong> ${item.reference_code}</p>
+            <p><strong>Latest Bargain:</strong> <strong>₱${
+              item.latest_bargain || ""
+            }</strong></p>
+            <p><strong>Bundle Code:</strong> ${item.bundle_id.item_code}</p>
+            <p><strong>Description:</strong> ${item.description}</p>
+            <p><strong>Bundle Desc:</strong> ${item.bundle_id.description}</p>
+            <p><strong>Branch:</strong> ${item.branch_name}</p>
+            <a href="${url}" target="_blank" class="bargain-btn"><button class="btn-secondary btn-sm btn-block">Bargain</button></a>
+        `;
+      container.appendChild(card);
+    });
+  }
+
+  document.getElementById("spinner").style.display = "block";
+
+  window.addEventListener("load", function () {
+    document.getElementById("spinner").style.display = "none";
+    document.getElementById("content").style.display = "block";
+  });
+</script>
+
+<style>
+  p {
+    margin: 3px 0;
+  }
+  .card {
+    width: 225px;
+    margin: 3px;
+    height: fit-content;
+    padding: 0 10px 0 10px;
+  }
+  .card .item-code {
+    text-align: center;
+  }
+  .card .price {
+    text-align: right;
+  }
+  .card .price .badge {
+    background-color: rgb(117, 0, 0);
+    border-radius: 200px 0px 200px 200px;
+    -webkit-border-radius: 200px 0px 200px 200px;
+    -moz-border-radius: 200px 0px 200px 200px;
+    color: #fff;
+  }
+  #addedItemsList {
+    /* background-color: #1c3438; */
+    color: #fff;
+    padding: 10px;
+    border-radius: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    max-width: 30%;
+    height: fit-content;
+    flex-direction: column;
+    width: fit-content;
+  }
+
+  #addedItemsList table tr td,
+  #addedItemsList table tr th {
+    border: 1px solid rgba(172, 255, 47, 0.416);
+    background-color: rgb(74, 7, 7);
+    font-size: clamp(0.875rem, 0.5811rem + 0.627vw, 1.125rem);
+    text-align: center;
+  }
+
+  #totalPrice {
+    background-color: rgb(67, 0, 0);
+    color: #fff;
+    padding: 10px;
+    width: 100%;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    font-size: 30px;
+    display: flex;
+    justify-content: space-between;
+  }
+  .search-container {
+    margin: 0 auto 10px auto;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  #searchForm {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .search-input {
+    height: 40px;
+    border-radius: 10px;
+    font-size: 20px;
+    text-align: center;
+  }
+  .search-btn {
+    height: 30px;
+    width: 150px;
+    padding: 0 10px;
+    margin: 0;
+  }
+  .filter-btn {
+    height: 35px;
+    border-radius: 10px 0 0 10px;
+  }
+  .alert {
+    margin-top: 20px;
+  }
+
+  .content-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+  }
+  .item-container {
+    width: 100%;
+    height: 100%;
+    border-radius: 10px;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+  .refresh-btn {
+    border-radius: 50%;
+    overflow: hidden;
+    float: right;
+    height: 50px;
+    width: 55px;
+    padding: 0;
+  }
+  .purchase-table {
+    height: 30vh;
+    width: 100%;
+    overflow: scroll;
+  }
+  .left-container {
+    display: flex;
+    flex-direction: column;
+  }
+  .bargain-btn {
+    width: 100%;
+  }
+  .spinner {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    width: 40px;
+    height: 40px;
+    margin: -20px 0 0 -20px;
+    border: 4px solid rgba(0, 0, 0, 0.1);
+    border-left-color: #29d;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    z-index: 1000;
+  }
+  .hint {
+    text-align: center;
+    color: gray;
+  }
+
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  @media screen and (max-width: 700px) {
+    .search-input,
+    .search-btn {
+      width: 100%;
+      height: 40px;
+    }
+    .content-container {
+      flex-direction: column;
+    }
+    .item-container {
+      width: 90%;
+      margin: auto;
+      max-height: 50vh;
+      overflow-y: scroll;
+      display: flex;
+      justify-content: center;
+      padding-bottom: 0;
+    }
+    #addedItemsList {
+      width: 100%;
+      margin: 0;
+      max-width: none;
+    }
+    .card p {
+      font-size: 12px;
+    }
+    .search-container {
+      margin: 50px 20px 0 20px;
+    }
+  }
+</style>

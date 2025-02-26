@@ -1,0 +1,39 @@
+.custom-grid table {
+  background-color: #343a40; /* Dark background color */
+  color: #ffffff; /* White text color */
+  width: 100%;
+  border-collapse: collapse; /* Collapse borders */
+}
+
+.custom-grid table th {
+  background-color: #495057; /* Slightly lighter dark background for headers */
+  color: #ffffff; /* White text color for headers */
+  padding: 8px; /* Add padding to headers */
+}
+
+.custom-grid table td {
+  background-color: #343a40; /* Same dark background color for table cells */
+  color: #ffffff; /* White text color for table cells */
+  padding: 8px; /* Add padding to cells */
+}
+
+/* Alternating row colors */
+.custom-grid table tr:nth-child(even) {
+  background-color: #454d55; /* Darker color for even rows */
+}
+
+.custom-grid table tr:nth-child(odd) {
+  background-color: #343a40; /* Same dark color for odd rows */
+}
+
+.custom-grid .web2py_counter {
+  color: #ffffff; /* White text color for counter */
+}
+
+.custom-grid .web2py_table th a {
+  color: #ffffff; /* White text color for sortable headers */
+}
+
+.custom-grid .web2py_table td a {
+  color: #ffffff; /* White text color for links in table cells */
+}

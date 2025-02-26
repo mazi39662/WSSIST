@@ -1,0 +1,692 @@
+{{extend 'layout.html'}}
+
+<div >
+
+
+<div id="content">
+<div class="search-container">
+  <input
+        type="hidden"
+        name="branch_id"
+        id="branch_id"
+        value="{{=branch_id}}"
+    />
+  <input
+    type="number"
+    name="reference_code"
+    id="reference_code"
+    class="search-input"
+    
+    placeholder="Enter Reference Code"
+  />
+  <button class="btn" onclick="onInputChange()">Search</button>
+  <p style="text-align: center; color: gray; margin: 0 20px;">
+    Please enter at least 4 digits to narrow down the results and avoid searching through thousands of records.
+  </p>
+  
+  <form id="searchForm">
+    
+  </form>
+</div>
+
+<button type="button" class="btn btn-danger" data-toggle="modal" data-target="#detailsModal">
+  <i class="fa-solid fa-receipt"></i> View Purchase History
+</button>
+
+<div id="content">
+  
+<div class="content-container">
+  <div class="left-container">
+
+    <div class="inner-content-container" id="cards-container" style="padding: 10px;">
+      <!-- Cards will be dynamically inserted here -->
+      <div id="spinner" class="spinner"></div>
+    </div>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+  <div class="purchase-table" style="display: none;">
+ 
+    <table class="table table-striped" >
+      <thead style="position: sticky; top: 0px; background-color: white;">
+        <br>
+          <tr>
+              <th>Item</th>
+              <th>Reference Code</th>
+              <th>Price</th>
+              <th>Purchase Time</th>
+          </tr>
+      </thead>
+      <tbody>
+          {{ for row in purchase_table: }}
+          <tr>
+              <td>{{=row.item}}</td>
+              <td>{{=row.reference_code}}</td>
+              <td>{{=row.price}}</td>
+              <td>{{=row.purchase_time}}</td>
+          </tr>
+          {{pass}}
+      </tbody>
+  </table>
+  </div>
+</div>
+
+  
+  <div id="addedItemsList">
+    <table>
+      <thead>
+        <tr>
+          <th>Item</th>
+          <th>Reference Code</th>
+          <th>Price</th>
+          <th>Branch ID</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Rows with data will be dynamically added here --> 
+      </tbody>
+      
+    </table>
+    <button
+      type="button"
+      class="btn btn-success btn-block btn-large"
+      onclick="storePurchase()"
+    >
+      PAY
+    </button>
+    {{if auth.has_membership(auth.id_group('admin')) or auth.has_membership(auth.id_group('ceo')) or auth.has_membership(auth.id_group('super-admin')):}}
+    <a href="{{=URL('default', 'create_purchase', args=branch_id)}}" class="btn btn-primary btn-block btn-large">Create Purchase</a>
+    {{pass}}
+    <br>
+         <br>
+         <br>
+         <br>
+         <br>
+         <br>
+  </div>
+
+</div>
+
+
+<div class="fixed-bottom" id="totalPrice">
+  <p><strong>Total Price:</strong></p>
+  <p>
+    <strong>₱<span id="sumPrice"> 0.00</span></strong>
+  </p>
+</div>
+
+<div
+  class="modal fade"
+  id="confirmationModal"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="confirmationModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5
+          class="modal-title"
+          id="confirmationModalLabel"
+          style="color: black"
+        >
+          Confirmation
+        </h5>
+        <button
+          type="button"
+          class="close"
+          data-dismiss="modal"
+          aria-label="Close"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">Do you want to proceed with the payment?</div>
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="btn btn-secondary"
+          data-dismiss="modal"
+          id="cancelButton"
+        >
+          Cancel
+        </button>
+        <button type="button" class="btn btn-primary" id="confirmButton">
+          Confirm
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div
+  class="alert alert-success alert-dismissible fade"
+  role="alert"
+  id="successAlert"
+  style="position: fixed; top: 0; left: 0; right: 0; z-index: 1000"
+>
+  Successfully processed payment.
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+</div>
+
+<div class="modal fade" id="detailsModal" tabindex="-1" role="dialog" aria-labelledby="detailsModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="detailsModalLabel">Purchase History Detail of {{=branch_name}} <i class="fa-solid fa-receipt"></i></h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p><strong>Daily Sales: ₱<span id="modalTotalPrice">0.00</span></strong> in <strong>{{=current_date}}</strong></p>
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th>Reference Code</th>
+              <th>Price</th>
+              <th>Purchase Time</th>
+            </tr>
+          </thead>
+          <tbody id="modalPurchaseDetailsBody">
+            <!-- Rows will be dynamically added here -->
+          </tbody>
+        </table>
+       
+      </div>
+      
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script>
+  let totalSum = 0;
+  // function onInputChange() {
+  //   var searchedReferenceCode = document.getElementById("reference_code").value;
+  //   if(searchedReferenceCode.length >= 3) {
+  //     submitForm();
+  //   } else if (searchedReferenceCode.length === 0) {
+  //       submitForm();
+  //   }
+    
+  // }
+
+  // function submitForm() {
+  //   var searchedReferenceCode = document.getElementById("reference_code").value;
+
+  //   var cards = document.querySelectorAll(".card");
+  //   cards.forEach(function (card) {
+  //     var cardReferenceCode = card.getAttribute("data-reference-code");
+
+  //     if (searchedReferenceCode === null || searchedReferenceCode === "") {
+  //       card.style.display = "flex";
+  //     } else {
+  //       if (cardReferenceCode.includes(searchedReferenceCode)) {
+  //         card.style.display = "flex";
+  //       } else {
+  //         card.style.display = "none";
+  //       }
+  //     }
+  //   });
+  // }
+
+  function addItemToTable(item, price, referenceCode, latestBargain, branchId) {
+    var table = document.querySelector("#addedItemsList table");
+    var row = table.insertRow(-1);
+    var cell1 = row.insertCell(0);
+    var cell2 = row.insertCell(1);
+    var cell3 = row.insertCell(2);
+    var cell4 = row.insertCell(3); // Cell for branch ID
+    var cell5 = row.insertCell(4); // Cell for action buttons
+    console.log("clicked")
+    cell1.innerHTML = item;
+    cell2.innerHTML = referenceCode;
+
+    var displayPrice = latestBargain !== null ? latestBargain : price;
+    cell3.innerHTML = parseFloat(displayPrice).toFixed(2);
+
+    cell4.innerHTML = branchId; // Display branch ID in the new cell
+
+    cell5.innerHTML = `<button type="button" class="btn btn-warning" onclick="removeItemFromTable(this)">
+         <i class="fas fa-trash"></i>
+       </button>`;
+
+    totalSum += parseFloat(displayPrice);
+    document.getElementById("sumPrice").innerHTML = totalSum.toFixed(2);
+}
+
+
+
+  function removeItemFromTable(button) {
+    var row = button.parentNode.parentNode;
+    var priceToRemove = parseFloat(row.cells[2].innerHTML);
+
+    totalSum -= priceToRemove;
+    document.getElementById("sumPrice").innerHTML = totalSum.toFixed(2);
+
+    row.parentNode.removeChild(row);
+  }
+
+  function filterBranch() {
+    var selectedBranchId = document.getElementById("branch").value;
+
+    var cards = document.querySelectorAll(".card");
+    cards.forEach(function (card) {
+      var cardBranchId = card.getAttribute("data-branch-id");
+
+      if (selectedBranchId === "" || cardBranchId === selectedBranchId) {
+        card.style.display = "flex";
+      } else {
+        card.style.display = "none";
+      }
+    });
+  }
+
+  function storePurchase() {
+    // Display the confirmation modal
+    var confirmationModal = document.getElementById("confirmationModal");
+    confirmationModal.classList.add("show");
+    confirmationModal.style.display = "block";
+    confirmationModal.setAttribute("aria-modal", "true");
+    confirmationModal.setAttribute("role", "dialog");
+
+    // Add event listener to confirm button
+    var confirmButton = document.getElementById("confirmButton");
+    confirmButton.addEventListener("click", function () {
+        // Proceed with the payment
+        var itemsTable = document.getElementById("addedItemsList").querySelector("table");
+        var rows = itemsTable.querySelectorAll("tr");
+
+        // Convert purchases array to JSON string
+        var purchases = [];
+        rows.forEach(function (row) {
+            // Check if the row contains only header cells
+            if (row.querySelectorAll("th").length > 0) {
+                return; // Skip header rows
+            }
+
+            var cells = row.querySelectorAll("td");
+            // Check if the row has at least 3 data cells
+            if (cells.length >= 3) {
+                var item = cells[0].textContent.trim();
+                var referenceCode = cells[1].textContent.trim();
+                var price = parseFloat(cells[2].textContent.trim());
+                var branchId = cells[3].textContent.trim(); // Assuming branch ID is in the 4th cell
+
+                purchases.push({
+                    item: item,
+                    reference_code: referenceCode,
+                    price: price,
+                    branch_id: branchId // Include branch ID
+                });
+            } else {
+                // Skip rows that don't have enough cells
+                console.warn("Skipping row - Invalid format:", row);
+            }
+        });
+
+        // Convert purchases array to JSON string
+        var jsonData = JSON.stringify({ purchases: purchases });
+
+        // Send AJAX request to store purchases
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", "{{=URL('store_purchase')}}", true);
+        xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4) {
+                if (xhr.status === 200) {
+                    // Hide the modal
+                    confirmationModal.classList.remove("show");
+                    confirmationModal.style.display = "none";
+                    confirmationModal.setAttribute("aria-modal", "false");
+
+                    // Show success alert
+                    var successAlert = document.getElementById("successAlert");
+                    successAlert.classList.add("show");
+                    setTimeout(function () {
+                        successAlert.classList.remove("show");
+                    }, 3000); // Hide the alert after 5 seconds
+
+                    // After successful storage, clear the table contents
+                    clearTableContents();
+                } else {
+                    // Show error message (assuming you have an error modal)
+                    var errorModal = document.getElementById("errorModal");
+                    errorModal.classList.add("show");
+                    errorModal.style.display = "block";
+                    errorModal.setAttribute("aria-modal", "true");
+                    errorModal.setAttribute("role", "dialog");
+                }
+            }
+        };
+        xhr.send(jsonData);
+        clearTableContents();
+    });
+
+    // Add event listener to cancel button
+    var cancelButton = document.getElementById("cancelButton");
+    cancelButton.addEventListener("click", function () {
+        // Hide the modal
+        confirmationModal.classList.remove("show");
+        confirmationModal.style.display = "none";
+        confirmationModal.setAttribute("aria-modal", "false");
+    });
+}
+
+
+  function clearTableContents() {
+    var table = document.querySelector("#addedItemsList table");
+    var rowCount = table.rows.length;
+
+    // Remove all rows except the header row
+    for (var i = rowCount - 1; i > 0; i--) {
+      table.deleteRow(i);
+    }
+
+    // Clear the total price
+    totalSum = 0;
+    document.getElementById("sumPrice").innerHTML = totalSum.toFixed(2);
+  }
+
+  function refreshPage() {
+    location.reload();
+  }
+
+// Function to populate modal with purchase table data and total price
+function populateModalTable() {
+    var purchaseTable = document.querySelector(".purchase-table table tbody");
+    var modalTableBody = document.getElementById("modalPurchaseDetailsBody");
+    var totalPriceElement = document.getElementById("modalTotalPrice");
+
+    // Clear previous modal content
+    modalTableBody.innerHTML = '';
+    var totalSum = 0;
+
+    // Loop through the purchase table rows and clone them to the modal
+    purchaseTable.querySelectorAll("tr").forEach(function (row) {
+        var newRow = row.cloneNode(true);
+        modalTableBody.appendChild(newRow);
+
+        var cells = row.querySelectorAll("td");
+        if (cells.length >= 3) {
+            var price = parseFloat(cells[2].textContent.trim());
+            totalSum += price;
+        }
+    });
+
+    // Update the total price in the modal
+    totalPriceElement.textContent = totalSum.toFixed(2);
+}
+
+// Event listener to populate modal when it's shown
+$('#detailsModal').on('show.bs.modal', function () {
+    populateModalTable();
+});
+
+// new code
+
+function onInputChange() {
+    var searchedReferenceCode = document.getElementById("reference_code").value;
+    var branchId = document.getElementById("branch_id").value; // Get branch_id from a hidden input or dropdown
+    if (searchedReferenceCode && branchId) {
+        fetchCards(searchedReferenceCode, branchId);
+    }
+}
+
+function fetchCards(referenceCode, branchId) {
+    var xhr = new XMLHttpRequest();
+    xhr.open(
+        "GET",
+        `{{=URL('manager', 'fetch_cards_search')}}?reference_code=${referenceCode}&branch_id=${branchId}`,
+        true
+    );
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+            var response = JSON.parse(xhr.responseText);
+            displayCards(response.items);
+        }
+    };
+    xhr.send();
+}
+
+function displayCards(items) {
+    var container = document.getElementById("cards-container");
+    container.innerHTML = ""; // Clear existing cards
+
+    if (items.length === 0) {
+        container.innerHTML = "<p>No items found for this search.</p>";
+        return;
+    }
+
+    items.forEach(function (item) {
+        var card = document.createElement("div");
+        card.className = "card";
+        card.setAttribute("data-branch-id", item.bundle_id.branch);
+        card.setAttribute("data-reference-code", item.reference_code);
+
+        // Construct the URL using correct syntax for web2py URL generation
+        var url = "{{=URL('default', 'item_index')}}" + "/" + item.bundle_id.id;
+
+        card.innerHTML = `
+            <h3 class="price"><span class="badge"><s>₱</s trong> ${item.price}</span></h3>
+            <p><strong>Item:</strong> ${item.item}</p>
+            <p><strong>Reference Code:</strong> ${item.reference_code}</p>
+            <p><strong>Latest Bargain:</strong> <strong>₱${item.latest_bargain || ""}</strong></p>
+            <p><strong>Bundle Code:</strong> ${item.bundle_id.item_code}</p>
+            <p><strong>Description:</strong> ${item.description}</p>
+            <p><strong>Bundle Desc:</strong> ${item.bundle_id.description}</p>
+            <p><strong>Branch:</strong> ${item.branch_name}</p>
+            <p></p>
+            ${
+                item.quantity <= item.sold
+                    ? `<p style="color: red; font-weight: bold; text-align: center;">SOLD OUT</p>`
+                    : `<button
+                        type="button"
+                        class="btn btn-secondary btn-sm"
+                        onclick="addItemToTable('${item.item || 'null'}', '${item.price || 'null'}', '${item.reference_code || 'null'}', ${item.latest_bargain || 'null'}, '${item.bundle_id.branch || 'null'}')"
+                      >
+                        +ADD
+                      </button>`
+            }
+        `;
+
+        container.appendChild(card);
+    });
+}
+
+// Show spinner during load
+document.getElementById("spinner").style.display = "block";
+
+window.addEventListener("load", function () {
+    document.getElementById("spinner").style.display = "none";
+    document.getElementById("content").style.display = "block";
+});
+    
+    
+//     
+    
+    
+
+</script>
+
+
+
+<style>
+  p {
+    margin: 3px 0;
+  }
+  .card {
+    width: 225px;
+    margin: 3px;
+    height: fit-content;
+  }
+  .card .item-code {
+    text-align: center;
+  }
+  .card .price {
+    text-align: right;
+  }
+  .card .price .badge {
+    background-color: rgb(117, 0, 0);
+    border-radius: 200px 0px 200px 200px;
+    -webkit-border-radius: 200px 0px 200px 200px;
+    -moz-border-radius: 200px 0px 200px 200px;
+    color: #fff;
+  }
+  #addedItemsList {
+    /* background-color: #1c3438; */
+    color: #fff;
+    padding: 10px;
+    border-radius: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    max-width: 30%;
+    height: fit-content;
+    flex-direction: column;
+    width: fit-content;
+  }
+
+  #addedItemsList table tr td,
+  #addedItemsList table tr th {
+    border: 1px solid rgba(172, 255, 47, 0.416);
+    background-color: rgb(74, 7, 7);
+    font-size: clamp(0.875rem, 0.5811rem + 0.627vw, 1.125rem);
+    text-align: center;
+  }
+
+  #totalPrice {
+    background-color: rgb(67, 0, 0);
+    color: #fff;
+    padding: 10px;
+    width: 100%;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    font-size: 30px;
+    display: flex;
+    justify-content: space-between;
+  }
+  .search-container {
+    margin: 0 auto 10px auto;
+    text-align: center;
+  }
+  #searchForm {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .search-input {
+    height: 40px;
+    border-radius: 10px;
+    font-size: 20px;
+    text-align: center;
+  }
+  .search-btn {
+    height: 30px;
+    width: 150px;
+    padding: 0 10px;
+    margin: 0;
+  }
+  .filter-btn {
+    height: 35px;
+    border-radius: 10px 0 0 10px;
+  }
+  .alert {
+    margin-top: 20px; 
+  }
+
+  .content-container {
+    display: flex;
+    flex-direction: row;
+    
+  }
+  .inner-content-container {
+    display: flex;
+    flex-wrap: wrap;
+    background-color: rgb(216, 216, 216);
+    min-height: 60vh;
+    border-radius: 30px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2), 0 -4px 8px rgba(0, 0, 0, 0.1), inset 0 4px 8px rgba(0, 0, 0, 0.2);
+    border: 10px solid rgb(170, 170, 170);
+    margin: 10px;
+    justify-content: space-evenly;
+  }
+  .item-container {
+    width: 100%;
+    height: 50vh;
+    border-radius: 10px;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap:5px;
+    overflow-y: scroll;
+  }
+  .refresh-btn {
+    border-radius: 50%;
+    overflow: hidden;
+    float: right;
+    height: 50px;
+    width: 55px;
+    padding: 0;
+  }
+  .purchase-table {
+    height: 30vh;
+    width: 100%;
+    overflow: scroll;
+  }
+  .left-container {
+    display: flex;
+    flex-direction: column;
+    width: 80%;
+  }
+  
+  @media screen and (max-width: 700px) {
+    .search-input,
+    .search-btn {
+      width: 100%;
+      height: 40px;
+    }
+    .content-container {
+      flex-direction: column;
+    }
+    .item-container {
+      width: 90%;
+      margin: auto;
+      max-height: 50vh;
+      overflow-y: scroll;
+      display: flex;
+      justify-content: center;
+      padding-bottom: 0;
+    }
+     .left-container {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+      }
+    #addedItemsList {
+      width: 100%;
+      margin: 0;
+      max-width: none;
+    }
+    .card p {
+      font-size: 12px;
+    }
+    .search-container {
+      margin-top: 50px;
+    }
+  }
+</style>

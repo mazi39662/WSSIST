@@ -1,0 +1,264 @@
+{{extend 'layout.html'}}
+
+<div class="container search-container">
+  <h2>Search Price</h2>
+
+  <form id="searchForm">
+    <input
+      type="text"
+      name="reference_code"
+      id="reference_code"
+      class="search-input"
+      oninput="onInputChange()"
+    />
+
+    <input
+      type="button"
+      value="Search"
+      onclick="submitForm()"
+      class="search-btn"
+    />
+  </form>
+</div>
+
+<div class="content-container">
+  <div
+    style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center"
+    class="item-container"
+  >
+    {{for item in items:}}
+    <div class="card" data-reference-code="{{=item.reference_code}}">
+      <h3 class="price">
+        <span class="badge"><strong>₱</strong> {{=item.price}}</span>
+      </h3>
+
+      <p><strong>Item:</strong> {{=item.item}}</p>
+      <p><strong>Reference Code:</strong> {{=item.reference_code}}</p>
+      <p><strong>Latest Bargain:</strong> ₱{{=item.latest_bargain or ''}}</p>
+      <!-- <p><strong>Item No:</strong> {{=item.bundle_id.item_number}}</p> -->
+      <p><strong>Code:</strong> {{=item.bundle_id.item_code}}</p>
+      <p><strong>Description:</strong> {{=item.description}}</p>
+      <p><strong>Bundle Desc:</strong> {{=item.bundle_id.description}}</p>
+      <p><strong>Branch:</strong> {{=item.branch_name}}</p>
+
+      <br />
+      <button
+        type="button"
+        class="btn btn-secondary btn-sm"
+        onclick="addItemToTable('{{=item.item}}', '{{=item.price}}', '{{=item.reference_code}}', {{=item.latest_bargain or 'null'}})"
+      >
+        ADD
+      </button>
+    </div>
+
+    {{pass}}
+  </div>
+
+  <div id="addedItemsList">
+    <table>
+      <tr>
+        <th>Item</th>
+        <th>Reference Code</th>
+        <th>Price</th>
+        <th>Action</th>
+      </tr>
+    </table>
+    <button type="button" class="btn btn-success btn-block">PAY</button>
+  </div>
+</div>
+<br /><br /><br /><br /><br />
+
+<!-- <div
+  style="
+    color: hsl(140, 100%, 50%);
+    border: 1px solid hsl(140, 100%, 50%);
+    overflow: scroll;
+  "
+>
+  {{#=BEAUTIFY(items)}}
+</div> -->
+
+<div class="fixed-bottom" id="totalPrice">
+  <strong>Total Price: ₱<span id="sumPrice">0</span></strong>
+</div>
+
+<script>
+  let totalSum = 0;
+  function onInputChange() {
+    submitForm();
+  }
+
+  function submitForm() {
+    var searchedReferenceCode = document.getElementById("reference_code").value;
+
+    var cards = document.querySelectorAll(".card");
+    cards.forEach(function (card) {
+      var cardReferenceCode = card.getAttribute("data-reference-code");
+
+      if (searchedReferenceCode === null || searchedReferenceCode === "") {
+        card.style.display = "flex";
+      } else {
+        if (cardReferenceCode.includes(searchedReferenceCode)) {
+          card.style.display = "flex";
+        } else {
+          card.style.display = "none";
+        }
+      }
+    });
+  }
+
+  function addItemToTable(item, price, referenceCode, latestBargain) {
+    var table = document.querySelector("#addedItemsList table");
+    var row = table.insertRow(-1);
+    var cell1 = row.insertCell(0);
+    var cell2 = row.insertCell(1);
+    var cell3 = row.insertCell(2);
+    var cell4 = row.insertCell(3);
+
+    cell1.innerHTML = item;
+    cell2.innerHTML = referenceCode;
+
+    var displayPrice = latestBargain !== null ? latestBargain : price;
+    cell3.innerHTML = parseFloat(displayPrice).toFixed(2);
+
+    cell4.innerHTML =
+      '<button type="button" class="btn btn-warning" onclick="removeItemFromTable(this)">Remove</button>';
+
+    totalSum += parseFloat(displayPrice);
+    document.getElementById("sumPrice").innerHTML = totalSum.toFixed(2);
+  }
+
+  function removeItemFromTable(button) {
+    var row = button.parentNode.parentNode;
+    var priceToRemove = parseFloat(row.cells[2].innerHTML);
+
+    totalSum -= priceToRemove;
+    document.getElementById("sumPrice").innerHTML = totalSum.toFixed(2);
+
+    row.parentNode.removeChild(row);
+  }
+</script>
+
+<style>
+  .card {
+    width: 270px;
+    margin: 0;
+    height: fit-content;
+  }
+  .card .item-code {
+    text-align: center;
+  }
+  .card .price {
+    text-align: right;
+  }
+  .card .price .badge {
+    background-color: rgb(0, 152, 137);
+    border-radius: 200px 0px 200px 200px;
+    -webkit-border-radius: 200px 0px 200px 200px;
+    -moz-border-radius: 200px 0px 200px 200px;
+  }
+  #addedItemsList {
+    background-color: #1c3438;
+    color: #fff;
+    padding: 10px;
+    border-radius: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 30%;
+
+    height: fit-content;
+    flex-direction: column;
+  }
+
+  #addedItemsList table tr td,
+  #addedItemsList table tr th {
+    border: 1px solid rgba(172, 255, 47, 0.416);
+    padding: 5px;
+    font-size: clamp(0.875rem, 0.5811rem + 0.627vw, 1.125rem);
+  }
+
+  #totalPrice {
+    background-color: #1c3438;
+    color: #fff;
+    padding: 10px;
+    width: 100%;
+    height: 70px;
+    /* margin: 20px; */
+    display: flex;
+    align-items: center;
+    font-size: 30px;
+  }
+  .search-container {
+    margin: 10px auto;
+    text-align: center;
+  }
+  #searchForm {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .search-input {
+    height: 30px;
+  }
+  .search-btn {
+    height: 30px;
+    padding: 0 10px;
+    margin: 0;
+  }
+
+  .content-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+  }
+  .item-container {
+    width: 70%;
+    max-height: 70vh;
+    overflow-x: ;
+    border-radius: 20px;
+    display: flex;
+    flex-wrap: wrap;
+  }
+  @media screen and (max-width: 767px) {
+    .search-input,
+    .search-btn {
+      width: 100%;
+      height: 40px;
+    }
+    .content-container {
+      flex-direction: column;
+    }
+    .item-container {
+      width: 90%;
+      margin: auto;
+      max-height: 90vh;
+      overflow-y: scroll;
+    }
+    #addedItemsList {
+      width: fit-content;
+      margin: auto;
+    }
+  }
+</style>
+
+<!-- <script>
+    function submitForm() {
+        var referenceCode = document.getElementById('reference_code').value;
+        var url = "{{=URL('default', 'search_price_result')}}";
+        var data = "reference_code=" + encodeURIComponent(referenceCode);
+
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", url, true);
+        xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                document.getElementById('resultContainer').innerHTML = xhr.responseText;
+            }
+        };
+
+        xhr.send(data);
+    }
+</script> -->

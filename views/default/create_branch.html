@@ -1,0 +1,7 @@
+{{extend 'layout.html'}}
+
+<div class="container">
+  <h2>Create Branch</h2>
+  <a href="{{=URL('branch_index')}}" class="btn btn-secondary">Cancel</a>
+  <form method="post" action="{{=URL('create_branch')}}">{{=form}}</form>
+</div>

@@ -1,0 +1,10 @@
+<!-- views/default/view_warehouse.html -->
+{{extend 'layout.html'}}
+
+<h1>Warehouse Details</h1>
+
+<p><strong>Name:</strong> {{=warehouse.name}}</p>
+<p><strong>Location:</strong> {{=warehouse.location}}</p>
+<p><strong>Capacity:</strong> {{=warehouse.capacity}}</p>
+
+<a href="{{=URL('default', 'warehouse')}}">Back to Warehouses</a>

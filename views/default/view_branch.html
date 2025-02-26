@@ -1,0 +1,10 @@
+{{extend 'layout.html'}}
+
+<div class="container">
+  <h2>Branch Details</h2>
+  <p><strong>Name:</strong> {{=branch.name}}</p>
+  <p><strong>Location:</strong> {{=branch.location}}</p>
+  <a href="{{=URL('branch_index')}}" class="btn btn-secondary"
+    >Back to Branches</a
+  >
+</div>

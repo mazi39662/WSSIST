@@ -1,0 +1,10 @@
+{{extend 'layout.html'}}
+
+<div class="container">
+  <h2>Delete Branch</h2>
+  <p>Are you sure you want to delete the branch "{{=branch.name}}"?</p>
+  <form method="post" action="{{=URL('delete_branch', args=[branch.id])}}">
+    <button type="submit" class="btn btn-danger">Yes, Delete</button>
+    <a href="{{=URL('branch_index')}}" class="btn btn-secondary">Cancel</a>
+  </form>
+</div>

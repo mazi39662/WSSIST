@@ -1,0 +1,56 @@
+{{extend 'layout.html'}}
+
+<div class="container">
+  <h2>Branches</h2>
+  <a href="{{=URL('create_branch')}}" class="btn btn-primary">Add Branch</a>
+  <br /><br />
+  <div class="container branches-container">
+    {{for branch in branches:}}
+    <div class="col-md-4">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">{{=branch.name}}</h5>
+          <p class="card-text">
+            Location: <strong>{{=branch.branch_location}}</strong>
+          </p>
+          <br />
+          <div class="btn-action-container">
+            <!-- <a href="{{=URL('search_price', args=[branch.id])}}" class="btn btn-primary btn-action">View</a> -->
+            <a
+              href="{{=URL('edit_branch', args=[branch.id])}}"
+              class="btn btn-warning btn-action"
+              >Edit</a
+            >
+            {{if auth.has_membership(auth.id_group('super-admin')):}}
+            <a
+              href="{{=URL('delete_branch', args=[branch.id])}}"
+              class="btn btn-danger btn-action"
+              >Delete</a
+            >
+            {{pass}}
+          </div>
+        </div>
+      </div>
+    </div>
+    {{pass}}
+  </div>
+</div>
+
+<style>
+  .btn-action-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    flex-direction: row;
+  }
+  .btn-action {
+    width: 100%;
+    border-radius: 0;
+  }
+  .branches-container {
+    display: flex;
+    flex-wrap: wrap;
+  }
+</style>

@@ -1,0 +1,44 @@
+{{extend 'layout.html'}}
+<h2>Bundle Item Details</h2>
+
+<table>
+  <th>Total Sales</th>
+  <td>{{=item.total_sales}}</td>
+  <tr>
+    <th>Item</th>
+    <td>{{=item.item}}</td>
+  </tr>
+  <tr>
+    <th>Description</th>
+    <td>{{=item.description}}</td>
+  </tr>
+  <tr>
+    <th>Price</th>
+    <td>{{=item.price}}</td>
+  </tr>
+  <tr>
+    <th>Quantity</th>
+    <td>{{=item.quantity}}</td>
+  </tr>
+  <tr>
+    <th>Sold</th>
+    <td>{{=item.sold}}</td>
+  </tr>
+  <tr>
+    <th>Balance</th>
+    <td>{{=item.balance}}</td>
+  </tr>
+  <tr>
+    <th>Amount</th>
+    <td>{{=item.amount}}</td>
+  </tr>
+  <tr>
+    <th>Reference Code</th>
+    <td>{{=item.reference_code}}</td>
+  </tr>
+  <tr>
+    <th>Created</th>
+    <td>{{=item.creation_time}}</td>
+  </tr>
+</table>
+<a href="{{=URL('default', 'index')}}">Back to List</a>

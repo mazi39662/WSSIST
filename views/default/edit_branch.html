@@ -1,0 +1,9 @@
+{{extend 'layout.html'}}
+
+<div class="container">
+  <h2>Edit Branch</h2>
+  <a href="{{=URL('branch_index')}}" class="btn btn-secondary">Cancel</a>
+  <form method="post" action="{{=URL('edit_branch', args=[branch.id])}}">
+    {{=form}}
+  </form>
+</div>

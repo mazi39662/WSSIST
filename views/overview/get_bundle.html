@@ -1,0 +1,12 @@
+{{ for item in bundle_items: }}
+<div>
+  <p>Item: {{= item.item }}</p>
+  <p>Description: {{= item.description }}</p>
+  <p>Price: {{= item.price }}</p>
+  <p>Quantity: {{= item.quantity }}</p>
+  <p>Sold: {{= item.sold }}</p>
+  <p>Balance: {{= item.balance }}</p>
+  <p>Total Sales: {{= item.total_sales }}</p>
+  <p>Creation Time: {{= item.creation_time }}</p>
+</div>
+{{pass}}

@@ -1,0 +1,81 @@
+{{extend 'layout.html'}}
+
+<!-- Add jQuery UI CSS -->
+<link
+  href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css"
+  rel="stylesheet"
+/>
+
+<div class="container mt-4">
+  <h2 class="mb-4">Daily Sales by Branch</h2>
+
+  <!-- Date Picker Form -->
+  <form action="{{=URL('index')}}" method="get" class="date-picker-container">
+    <div class="form-group">
+      <input
+        type="text"
+        id="date-picker"
+        name="selected_date"
+        class="form-control"
+        value="{{=selected_date}}"
+      />
+    </div>
+    <button type="submit" class="btn btn-primary submit-btn">
+      Get Total Sales
+    </button>
+  </form>
+
+  <div class=" card-container">
+    {{for branch_name, total_sales in total_sales_dict.items():}}
+    
+      <div class="card">
+        <div class="card-body">
+          <p class="card-text" style="float: right; margin: 0; padding: 0 5px; color: white; background-color:  rgb(117, 0, 0); border-radius: 10px 0 10px 10px; width: fit-content;"><strong>{{=selected_date}}</strong></p>
+          <h5 class="card-title">
+            Branch: {{=branch_name if branch_name else 'Unknown'}}
+          </h5>
+          <p class="card-text">Total Sales: ₱{{='{:,.2f}'.format(total_sales)}}</p>
+        </div>
+      </div>
+    
+    {{pass}}
+  </div>
+</div>
+
+<!-- Add jQuery and jQuery UI -->
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+
+<script>
+  $(function () {
+    $("#date-picker").datepicker({
+      dateFormat: "yy-mm-dd",
+    });
+  });
+</script>
+
+<style>
+  .date-picker-container {
+    width: fit-content;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  .submit-btn {
+    height: fit-content;
+  }
+  .form-group {
+    margin: 0;
+  }
+  .card {
+    width: 250px;
+  }
+  .card-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+</style>

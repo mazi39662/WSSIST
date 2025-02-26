@@ -1,0 +1,21 @@
+{{extend 'layout.html'}}
+
+<div class="container bundle-detail-card">
+  <h1>Bundle Details</h1>
+
+  <p><strong>Item Code:</strong> {{=bundle.item_code}}</p>
+  <p><strong>Description:</strong> {{=bundle.description}}</p>
+  <p><strong>Price:</strong> {{=bundle.price}}</p>
+  <p><strong>Timestamp:</strong> {{=bundle.creation_time}}</p>
+
+  <a href="{{=URL('default', 'index')}}">Back to Bundles</a>
+</div>
+
+<style>
+  .bundle-detail-card {
+    background-color: whitesmoke;
+    width: fit-content;
+    min-height: 300px;
+    padding: 10px 20px 10px 20px;
+  }
+</style>

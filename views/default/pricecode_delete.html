@@ -1,0 +1,8 @@
+<!-- views/price_code/price_delete.html -->
+{{extend 'layout.html'}}
+<h2>Delete Price Code</h2>
+<p>Are you sure you want to delete this price code?</p>
+<form method="post">
+  <input type="submit" value="Delete" />
+  <a href="{{=URL('pricecode_create')}}">Cancel</a>
+</form>

@@ -1,0 +1,11 @@
+{{extend 'layout.html'}}
+<div class="container">
+  <h2>Edit Bundle Item {{=bundle_id}}</h2>
+  <a
+    href="{{=URL('default', 'item_index', args=[bundle_id])}}"
+    class="btn btn-warning"
+  >
+    Back to List
+  </a>
+  {{=form}}
+</div>

@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html class="no-js" lang="{{=T.accepted_language or 'en'}}">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      http-equiv="X-UA-Compatible"
+      content="IE=edge{{=not request.is_local and ',chrome=1' or ''}}"
+    />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{=response.title or request.application}}</title>
+    <meta name="application-name" content="{{=request.application}}" />
+    <meta name="google-site-verification" content="" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+    <link rel="stylesheet" href="{{=URL('static','css/bootstrap.min.css')}}" />
+    <link
+      rel="stylesheet"
+      href="{{=URL('static','css/web2py-bootstrap4.css')}}"
+    />
+    <link
+      rel="shortcut icon"
+      href="{{=URL('static','images/favicon.ico')}}"
+      type="image/x-icon"
+    />
+    <link
+      rel="apple-touch-icon"
+      href="{{=URL('static','images/favicon.png')}}"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="{{=URL('static', 'css/custom_styles.css')}}"
+    />
+    <link rel="stylesheet" href="{{=URL('static', 'css/bootstrap.min.css')}}" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="{{=URL('static','js/modernizr-2.8.3.min.js')}}"></script>
+    {{include 'web2py_ajax.html'}}
+    <style>
+      a {
+        color: black;
+      }
+      .side-panel {
+        position: fixed;
+        top: 0;
+        left: -250px; /* Initially hide the side panel */
+        bottom: 0;
+        width: 250px;
+        background-color: #f8f9fa;
+        padding-top: 60px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        transition: left 0.3s ease; /* Smooth transition animation */
+        z-index: 1000;
+      }
+
+      .side-panel ul {
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+      }
+
+      .side-panel ul li {
+        padding: 10px 20px;
+        border-bottom: 1px solid #ddd;
+      }
+
+      .side-panel ul li a {
+        text-decoration: none;
+        color: #333;
+      }
+
+      .side-panel ul li:last-child {
+        border-bottom: none;
+      }
+
+      .main-container {
+        margin-left: 0; /* Adjust margin to account for the side panel */
+      }
+
+      /* Style for the toggle button */
+      #toggleButton {
+        position: absolute;
+        left: 10px;
+        top: 10px;
+        background-color: rgb(117, 0, 0);
+        
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-md bg-faded justify-content-center">
+      {{if auth.has_membership(auth.id_group('admin')) or auth.has_membership(auth.id_group('ceo')) or auth.has_membership(auth.id_group('super-admin')):}}
+        <button id="toggleButton" class="btn btn-secondary" onclick="toggleSidePanel()" style="z-index: 1001;">
+        <i class="fa-solid fa-bars"></i>
+</button>
+{{pass}}
+
+      <a
+        href="{{=URL('default','index')}}"
+        class="navbar-brand"
+        style="position: absolute; top: 0; margin: 0px auto; color: rgb(117, 0, 0);"
+      >
+        <strong><img
+          src="{{=URL('static','images/wss.png')}}"
+          style="height: 50px; width: auto"
+        /> WJV Ukay-Ukay IST</strong>
+      </a>
+      <!-- <button
+        class="navbar-toggler"
+        type="button"
+        data-toggle="collapse"
+        data-target="#navbarNavDropdown"
+        aria-controls="navbarNavDropdown"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button> -->
+      <div
+        class="collapse navbar-collapse justify-content-end"
+        id="navbarNavDropdown"
+      >
+        <!-- <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="nav-link" href="{{=URL('default','user/profile')}}"
+              >Profile</a
+            >
+          </li>-->
+          
+            <a class="nav-link" href="{{=URL('default','user/logout')}}"
+              >Logout</a
+            >
+          
+        <!-- </ul>  -->
+      </div>
+    </nav>
+
+    <!-- Side Panel -->
+    <div class="side-panel" id="sidePanel">
+      <!-- <h4 style="text-align: center;">WJVU-IST</h4> -->
+      <ul>
+        <li>
+          <a href="{{=URL('default','branch_pos')}}"
+            ><button class="btn  btn-sm btn-block" style="background-color: rgb(117, 0, 0); color: #ffff;"><strong>POS</strong></button>
+          </a>
+        </li>
+        <li><a href="{{=URL('default','bundles')}}"><i class="fas fa-box"></i> Bundle Management</li>
+          
+        <li><a href="{{=URL('manager','manager_request')}}"><i class="fa-solid fa-hand-point-up"></i> Bargain Request</li>
+        <li><a href="{{=URL('manager','bundle_bargain_request')}}"><i class="fa-solid fa-barcode"></i> Bargain Management</li>
+        <!-- <li><a href="{{=URL('default','pricecode_index')}}"><i class="fas fa-solid fa-tags"></i> Price Codes</li> -->
+        <li><a href="{{=URL('dashboard','index')}}"><i class="fa-solid fa-money-bill-wave"></i> Sales Report</li>
+        <li>
+          <a href="{{=URL('overview','index')}}">
+            <i class="fa-solid fa-square-poll-horizontal"></i> 
+            Bundle Overview</a>
+        </li>
+        <li><a href="{{=URL('default','branch_index')}}"><i class="fas fa-code-branch"></i> Branch Settings</a></li>
+      </ul>
+      <p style="text-align: center; position: absolute; bottom: 10px; left: 0; right: 0;"><strong>Franz</strong></p>
+      <p style="text-align: center; position: absolute; bottom: 0; left: 0; right: 0;"><strong>Programmer</strong></p>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-container">
+      {{include}} {{=response.toolbar() if response.show_toolbar else ''}}
+    </div>
+
+    <!-- Footer -->
+    <!-- <footer class="footer">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="text-center text-muted">
+              <p>
+                &copy; {{=request.now.year}} Professional System. All Rights
+                Reserved.
+              </p>
+              <p>Powered by <a href="http://www.web2py.com/">web2py</a></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer> -->
+
+    <!-- Toggle Button -->
+    <!-- <button
+      id="toggleButton"
+      class="btn btn-secondary"
+      onclick="toggleSidePanel()"
+    >
+      <i class="fa-solid fa-bars"></i>
+    </button> -->
+
+    <!-- JavaScript -->
+    <script src="{{=URL('static','js/bootstrap.bundle.min.js')}}"></script>
+    <script src="{{=URL('static','js/web2py-bootstrap4.js')}}"></script>
+    <script>
+      function toggleSidePanel() {
+        var panel = document.getElementById("sidePanel");
+        var button = document.getElementById("toggleButton");
+        if (panel.style.left === "0px") {
+          panel.style.left = "-250px";
+        } else {
+          panel.style.left = "0px";
+        }
+      }
+    </script>
+    {{block page_js}}{{end page_js}} {{if response.google_analytics_id:}}
+    <!-- Analytics -->
+    <script src="{{=URL('static','js/analytics.min.js')}}"></script>
+    <script type="text/javascript">
+      analytics.initialize({
+        "Google Analytics": { trackingId: "{{=response.google_analytics_id}}" },
+      });
+    </script>
+    {{pass}}
+  </body>
+</html>

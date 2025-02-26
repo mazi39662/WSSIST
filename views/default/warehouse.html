@@ -1,0 +1,33 @@
+<!-- views/default/warehouse.html -->
+{{extend 'layout.html'}}
+
+<h1>Warehouses</h1>
+<a href="{{=URL('default', 'create_warehouse')}}">Create New Warehouse</a>
+<a href="{{=URL('default', 'index')}}">Go to Index</a>
+{{if warehouses:}}
+  <table>
+    <tr>
+      <th>Name</th>
+      <th>Location</th>
+      <th>Capacity</th>
+      <th>Action</th>
+    </tr>
+    {{for warehouse in warehouses:}}
+      <tr>
+        <td>{{=warehouse.name}}</td>
+        <td>{{=warehouse.warehouse_location}}</td>
+        <td>
+          <a href="{{=URL('default', 'view_warehouse', args=[warehouse.id])}}">View</a>
+          <a href="{{=URL('default', 'edit_warehouse', args=[warehouse.id])}}">Edit</a>
+          {{if auth.has_membership(auth.id_group('super-admin')):}}
+          <a href="{{=URL('default', 'delete_warehouse', args=[warehouse.id])}}">Delete</a>
+          {{pass}}
+        </td>
+      </tr>
+    {{pass}}
+  </table>
+{{else:}}
+  <p>No warehouses available.</p>
+{{pass}}
+
+

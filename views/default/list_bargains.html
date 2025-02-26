@@ -1,0 +1,45 @@
+{{extend 'layout.html'}}
+<div class="container mt-4" style="overflow: scroll;">
+  <a href="{{=URL('default', 'item_index', args=[bargain_id])}}" class="btn btn-warning btn-sm">Back</a>
+  <h2>Bargains</h2>
+  <a
+    href="{{=URL('default', 'create_bargain', args=[bundle_item_id, bargain_id])}}"
+    class="btn btn-success"
+    >Add Bargain</a
+  >
+  <table class="table table-striped">
+    <thead class="thead-dark">
+      <tr>
+        <th>Bargain Price</th>
+        <th>Bargain Type</th>
+        <th>Creation Time</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{ for bargain in bargains: }}
+      <tr>
+        <td>{{=bargain.bargain_price}}</td>
+        <td>{{=bargain.bargain_type}}</td>
+        <td>{{=bargain.creation_time}}</td>
+        <td>
+          <a
+            href="{{=URL('default', 'edit_bargain', args=[bargain.id, bargain_id])}}"
+            class="btn btn-warning btn-sm"
+            >Edit</a
+          >
+          {{if auth.has_membership(auth.id_group('super-admin')):}}
+          <a
+            href="{{=URL('default', 'delete_bargain', args=[bargain.id, bundle_item_id])}}"
+            class="btn btn-danger btn-sm"
+            onclick="return confirm('Are you sure?')"
+            >Delete</a
+          >
+          {{pass}}
+        </td>
+      </tr>
+      {{pass}}
+    </tbody>
+  </table>
+  <!-- <a href="{{=URL('default', 'bundles')}}">Back to Bundle Items</a> -->
+</div>
